@@ -75,5 +75,13 @@ crd: kind
 
 .PHONY: build
 build:
-	operator-sdk build --go-build-args "-ldflags -X=version.Version=${SECRET_OPERATOR_VERSION}" ${DOCKER_IMAGE}
+	CGO=0 operator-sdk build --image-build-args "buildx --platform=linux/arm64" --go-build-args "-ldflags -X=version.Version=${SECRET_OPERATOR_VERSION}" ${DOCKER_IMAGE}
 	@exit $(.SHELLSTATUS)
+
+.PHONY: docker
+docker:
+	# WARNING: Do not run this with multi-arch. It will give everyone the same binary.
+	# Plumbing this together is doable but I don't care right now.
+	# docker buildx build --platform linux/arm64 --pull --push -f build/Dockerfile -t ghcr.io/disconn3ct/mittwald/kubernetes-secret-generator:v3.4.0 .
+	#
+	docker buildx build --platform linux/arm64 --pull --push -f build/Dockerfile -t ghcr.io/disconn3ct/mittwald/kubernetes-secret-generator:v3.4.0 .
