@@ -2,7 +2,7 @@ SHELL=/usr/bin/env bash -o pipefail
 NAMESPACE=default
 KUBECONFIG=/tmp/kubeconfig
 VERSION ?= latest
-IMAGE_TAG_BASE ?= quay.io/mittwald/kubernetes-secret-generator
+IMAGE_TAG_BASE ?= ghcr.io/disconn3ct/mittwald/kubernetes-secret-generator
 IMG ?= secret-generator:${VERSION}
 
 .PHONY: install
@@ -77,3 +77,8 @@ crd: kind
 build:
 	operator-sdk build --go-build-args "-ldflags -X=version.Version=${SECRET_OPERATOR_VERSION}" ${DOCKER_IMAGE}
 	@exit $(.SHELLSTATUS)
+
+.PHONY: docker
+docker:
+	docker buildx build --platform linux/amd64,linux/arm64 --pull --push -f build/Dockerfile -t ${IMAGE_TAG_BASE}:${VERSION} .
+
