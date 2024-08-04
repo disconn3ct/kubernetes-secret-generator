@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.23.1 as builder
+FROM --platform=${BUILDARCH:-amd64} golang:1.23.1 AS builder
 
 WORKDIR /workdir
 # ENV GOPATH=/go
@@ -19,7 +19,7 @@ COPY version version
 RUN ls -la /workdir
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /workspace/manager ./cmd/manager/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -a -o /workspace/manager ./cmd/manager/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
